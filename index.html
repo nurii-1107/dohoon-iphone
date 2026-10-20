@@ -786,7 +786,7 @@ body=`<h1>${titleMap[settingsPage]||'설정'}</h1><div class="stgroup">${content
 }
 screen(`<div class="iossettings">${settingsPage==='root'?'':`<button class="stback" onclick="settingsBack()">‹ 설정</button>`}<div class="stbody">${body}</div></div>`);
 }
-const galleryPhotos=Array.from({length:27},(_,i)=>`gallery/photo_${String(i+1).padStart(2,'0')}.jpg`);
+const galleryPhotos=Array.from({length:27},(_,i)=>`photo_${String(i+1).padStart(2,'0')}.jpg`);
 let galleryIndex=-1;
 function renderPhotos(){galleryIndex=-1;screen(`<div class="page" style="min-height:100%;background:#fff"><div style="padding:8px 18px 13px"><div style="font-size:31px;font-weight:750;letter-spacing:-1px">사진</div><div style="font-size:13px;color:#777;margin-top:3px">사진 보관함 · ${galleryPhotos.length} 장의 사진</div></div><div class="gallery-grid">${galleryPhotos.map((f,i)=>`<button onclick="openGalleryPhoto(${i})" aria-label="사진 보기 ${i+1}"><img loading="lazy" src="${f}" alt="사진 ${i+1}"></button>`).join('')}</div><div style="text-align:center;color:#8e8e93;font-size:12px;padding:22px 0 40px">${galleryPhotos.length} 장의 사진</div></div>`)}
 function openGalleryPhoto(i){galleryIndex=Math.max(0,Math.min(galleryPhotos.length-1,i));showGalleryPhoto()}
