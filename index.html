@@ -159,15 +159,20 @@
 .seoul-weather-widget .weather-bottom small{font-size:10px;font-weight:400;color:#e4e8f3}
 .seoul-weather-widget .weather-thermometer{font-size:23px;line-height:1.2;flex-shrink:0}
 </style><style>
-/* Unlock-triggered KakaoTalk notifications: stay over any screen. */
-#group-wish-banner{position:absolute;z-index:155;top:47px;left:11px;right:11px;display:flex;align-items:center;gap:10px;text-align:left;width:calc(100% - 22px);border:0;border-radius:19px;padding:12px 13px;background:rgba(239,243,248,.97);color:#222936;box-shadow:0 8px 27px #14263b4a;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);cursor:pointer;transform:translateY(-115px);opacity:0;transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .26s ease;pointer-events:none}
-#group-wish-banner.visible{transform:translateY(0);opacity:1;pointer-events:auto}
-#group-wish-banner .wish-icon{width:39px;height:39px;border-radius:11px;background:#fee500;color:#372c00;display:grid;place-items:center;flex-shrink:0;font-weight:800;font-size:12px}
-#group-wish-banner .wish-body{flex:1;min-width:0;font-size:12px;line-height:1.45}
-#group-wish-banner .wish-head{font-size:11px;color:#707885;display:flex;justify-content:space-between;gap:6px;margin-bottom:2px}
-#group-wish-banner .wish-head b{font-size:12px;color:#202632}
-#group-wish-banner .wish-title{font-weight:750;font-size:13px;margin-bottom:2px}
-#group-wish-banner .wish-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Stacked KakaoTalk banners; swipe up to dismiss each card. */
+#group-wish-stack{position:absolute;z-index:155;top:48px;left:11px;right:11px;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-height:calc(100% - 120px);overflow:visible}
+.group-wish-card{width:100%;border:1px solid rgba(255,255,255,.72);border-radius:21px;padding:12px 12px;min-height:79px;display:flex;gap:10px;align-items:center;text-align:left;background:rgba(245,248,252,.94);color:#1d2733;box-shadow:0 6px 22px #263e5528;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none;pointer-events:auto;opacity:0;transform:translateY(-95px) scale(.97);transition:transform .34s cubic-bezier(.18,.86,.23,1),opacity .3s ease,max-height .28s ease,margin .28s ease,padding .28s ease;overflow:hidden;flex-shrink:0}
+.group-wish-card.visible{opacity:1;transform:translateY(0) scale(1)}
+.group-wish-card.dismissing{opacity:0;transform:translateY(-110px) scale(.95);pointer-events:none}
+.group-wish-avatar{height:43px;width:43px;border-radius:50%;background:#87c9d8;flex:0 0 43px;position:relative;display:grid;place-items:center}
+.group-wish-avatar svg{width:31px;height:31px;fill:#c2e8ef}
+.group-wish-talk{position:absolute;right:-5px;bottom:-4px;width:21px;height:21px;border-radius:6px;background:#fee500;display:grid;place-items:center;color:#342800;font-size:7px;font-weight:900;box-shadow:0 1px 4px #0005}
+.group-wish-content{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}
+.group-wish-header{display:flex;align-items:baseline;gap:7px}
+.group-wish-header strong{font-size:15px;line-height:1.1}
+.group-wish-header small{margin-left:auto;font-size:10px;color:#778695;white-space:nowrap}
+.group-wish-message{font-size:13px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:450px){#group-wish-stack{top:48px}}
 </style><style id="private-ig-styles">.ig-private-title{display:flex;align-items:center;justify-content:space-between;font-size:19px;padding:4px 0 19px}.ig-private-title button{background:none;border:0;color:white;font-size:26px}.private-avatar{background:linear-gradient(140deg,#c2d7e9,#627c9a)!important;font-size:35px!important}.private-stats{display:flex;justify-content:space-between;gap:18px;flex:1;text-align:center}.private-stats div{display:grid;gap:3px}.private-stats b{font-size:18px}.private-stats small{font-size:11px}.ig-private-note{font-size:11px;color:#a6b2c2;background:#252a34;padding:10px;border-radius:9px;margin:13px 0}.private-controls{display:flex;gap:7px;margin:15px 0}.private-controls button{flex:1;border:0;background:#343a44;color:white;padding:9px;border-radius:8px}.private-grid>button{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#9ab5cf,#e4e6ed)!important;color:#33475e;gap:8px}.private-grid>button:nth-child(2n){background:linear-gradient(145deg,#c7bed5,#eef0f6)!important}.private-grid>button span{font-size:35px}.private-grid>button small{font-size:10px}.ig-follow-row{display:flex;align-items:center;gap:10px;background:none;border:0;color:white;width:100%;padding:12px 0;text-align:left}.ig-follow-row>span:nth-child(2){display:grid;flex:1}.ig-follow-row small{color:#aab3bf}.ig-follow-row>span:last-child{font-size:11px;color:#aab3bf}</style>
 <style>
 /* V13: Instagram fullscreen story viewer */
@@ -1104,8 +1109,6 @@ function birthdayEndCall(){
 </script>
 <script id="group-birthday-unlock-notifications">
 (function(){
-  // No KakaoTalk notification is shown on the lock screen.
-  // Each new page load starts a fresh sequence, once the passcode is accepted.
   let started=false;
   const wishes=[
     ['신유','영재야 생일 축하해 🎂 오늘 맛있는 거 많이 먹고 행복한 하루 보내!'],
@@ -1113,42 +1116,115 @@ function birthdayEndCall(){
     ['지훈','영재 형 생일 축하해요!! 🥳🎂 오늘 케이크 같이 먹어요!'],
     ['경민','영재 형 생일 축하해요!! 🎂🎉 선물 기대해도 돼요 ㅋㅋ']
   ];
+  const esc=(s)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function stack(){
+    let el=document.getElementById('group-wish-stack');
+    if(!el){el=document.createElement('div');el.id='group-wish-stack';document.getElementById('phone').appendChild(el)}
+    return el;
+  }
   function openKktList(){
-    document.getElementById('group-wish-banner')?.remove();
-    // Always go to KakaoTalk's chat list, never into Youngjae's conversation.
+    document.getElementById('group-wish-stack')?.remove();
     birthdayKktVisited=true;
     kktRoom=null;
     kktTab='chats';
     app='KKT';
     render();
   }
+  function dismiss(card){
+    if(card.dataset.dismissed)return;
+    card.dataset.dismissed='1';
+    card.classList.add('dismissing');
+    setTimeout(()=>card.remove(),340);
+  }
   function showWish(i){
     if(i>=wishes.length)return;
     const [sender,message]=wishes[i];
-    document.getElementById('group-wish-banner')?.remove();
-    const banner=document.createElement('button');
-    banner.id='group-wish-banner';
-    banner.type='button';
-    banner.setAttribute('aria-label','카카오톡 TWS 단체방 '+sender+' 메시지, 채팅 목록 열기');
-    const escWish=(s)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    banner.innerHTML='<span class="wish-icon">TALK</span><span class="wish-body"><span class="wish-head"><b>KakaoTalk</b><span>지금</span></span><div class="wish-title">TWS 단체방 · '+escWish(sender)+'</div><div class="wish-text">'+escWish(message)+'</div></span>';
-    banner.addEventListener('click',openKktList);
-    document.getElementById('phone').appendChild(banner);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>banner.classList.add('visible')));
-    setTimeout(()=>{
-      if(banner.isConnected)banner.classList.remove('visible');
-      setTimeout(()=>{banner.remove();showWish(i+1)},340);
-    },3400);
+    const card=document.createElement('div');
+    card.className='group-wish-card';
+    card.setAttribute('role','button');
+    card.tabIndex=0;
+    card.setAttribute('aria-label','카카오톡 '+sender+' '+message+' 채팅 목록 열기');
+    card.innerHTML='<span class="group-wish-avatar"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="11" r="7"/><path d="M3 29c0-9 6-13 13-13s13 4 13 13z"/></svg><span class="group-wish-talk">TALK</span></span><span class="group-wish-content"><span class="group-wish-header"><strong>'+esc(sender)+'</strong><small>지금</small></span><span class="group-wish-message">'+esc(message)+'</span></span>';
+    let startX=0,startY=0,dragged=false,tracking=false;
+    card.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      tracking=true;dragged=false;startX=e.clientX;startY=e.clientY;
+      card.style.transition='none';
+      try{card.setPointerCapture(e.pointerId)}catch(_){}
+    });
+    card.addEventListener('pointermove',e=>{
+      if(!tracking)return;
+      const dy=e.clientY-startY,dx=e.clientX-startX;
+      if(Math.abs(dy)>7||Math.abs(dx)>9)dragged=true;
+      if(dragged){
+        card.style.transform='translate('+Math.max(-80,Math.min(80,dx))*.35+'px,'+Math.max(-125,Math.min(55,dy))+'px)';
+        card.style.opacity=String(Math.max(.2,1-Math.abs(dy)/170));
+      }
+    });
+    function endDrag(e){
+      if(!tracking)return;
+      tracking=false;
+      const dy=e.clientY-startY,dx=e.clientX-startX;
+      card.style.transition='';card.style.transform='';card.style.opacity='';
+      if(dy < -48 || Math.abs(dx)>95){dismiss(card)}
+      else if(!dragged)openKktList();
+      if(dragged){card.dataset.justDragged='1';setTimeout(()=>delete card.dataset.justDragged,150)}
+    }
+    card.addEventListener('pointerup',endDrag);
+    card.addEventListener('pointercancel',()=>{tracking=false;card.style.transition='';card.style.transform='';card.style.opacity=''});
+    card.addEventListener('click',e=>{if(card.dataset.justDragged||card.dataset.dismissed)return;if(e.detail===0)openKktList()});
+    card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openKktList()}});
+    stack().appendChild(card);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>card.classList.add('visible')));
+    // Messages accumulate like a real notification center, but can be swiped away individually.
+    if(i+1<wishes.length)setTimeout(()=>showWish(i+1),1650);
   }
   const oldPinPress=pinPress;
   pinPress=function(d){
     const wasPasscode=app==='passcode';
     oldPinPress.apply(this,arguments);
-    if(wasPasscode&&app==='home'&&!started){
-      started=true;
-      setTimeout(()=>showWish(0),650);
-    }
+    if(wasPasscode&&app==='home'&&!started){started=true;setTimeout(()=>showWish(0),700)}
   };
 })();
 </script>
-</body></html>
+<style id="kkt-unread-badge-style">
+.kkt-bottom button{position:relative}
+.kkt-bottom button .kkt-tab-icon-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:30px}
+.kkt-bottom button .kkt-tab-icon-wrap>span{font-size:26px;line-height:1}
+.kkt-unread-badge{position:absolute;top:-7px;right:-13px;min-width:21px;height:21px;padding:0 5px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#ff453a;color:#fff!important;border:2px solid #f8f8f8;font-size:12px!important;line-height:1;font-weight:700;font-style:normal;box-shadow:0 1px 2px #0002;pointer-events:none}
+</style><script id="kkt-unread-badge-logic">
+/* Transient unread counts reset when the simulator reloads. */
+(function(){
+ let unread=0;
+ const seen=new WeakSet();
+ function refresh(){
+  const bar=document.querySelector('.kkt-bottom');
+  if(!bar)return;
+  const buttons=[...bar.querySelectorAll('button')];
+  const chatButton=buttons.find(b=>b.getAttribute('onclick')?.includes("'chats'"));
+  if(!chatButton)return;
+  let icon=chatButton.querySelector('.kkt-tab-icon-wrap');
+  if(!icon){const old=chatButton.querySelector('span');if(!old)return;icon=document.createElement('span');icon.className='kkt-tab-icon-wrap';old.replaceWith(icon);icon.appendChild(old)}
+  icon.querySelector('.kkt-unread-badge')?.remove();
+  if(unread>0){const badge=document.createElement('i');badge.className='kkt-unread-badge';badge.textContent=unread>99?'99+':String(unread);badge.setAttribute('aria-label',unread+'개의 읽지 않은 메시지');icon.appendChild(badge)}
+ }
+ const oldRender=renderKKT;
+ renderKKT=function(){oldRender.apply(this,arguments);refresh()};
+ const oldSwitch=kktSwitch;
+ kktSwitch=function(t){if(t==='chats')unread=0;oldSwitch.apply(this,arguments);refresh()};
+ const observer=new MutationObserver(records=>{
+  let added=0;
+  for(const record of records)for(const node of record.addedNodes){
+   if(node.nodeType!==1)continue;
+   const cards=node.matches?.('.group-wish-card')?[node]:[...(node.querySelectorAll?.('.group-wish-card')||[])];
+   for(const card of cards)if(!seen.has(card)){seen.add(card);added++}
+  }
+  if(added){unread+=added;refresh()}
+ });
+ observer.observe(document.getElementById('phone')||document.body,{childList:true,subtree:true});
+ // Opening the chat list from a notification marks the new group messages read.
+ document.addEventListener('click',e=>{
+  if(e.target.closest?.('.group-wish-card'))setTimeout(()=>{if(app==='KKT'&&kktTab==='chats'&&!kktRoom){unread=0;refresh()}},0);
+ },true);
+})();
+</script></body></html>
