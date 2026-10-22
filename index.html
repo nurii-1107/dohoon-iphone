@@ -668,7 +668,7 @@ for(const [room,lines] of Object.entries(teammateStory)){
  {who:'최영재',text:'야 ㅋㅋ 내 생일인데 내가 먼저 먹어야지',date:'2029-05-31'}
 ]);
 
-function kktDateLabel(iso){const date=/^2029-05-(2[5-9]|3[01])$/.test(iso||'')?iso:'2029-05-31';const d=new Date(date+'T12:00:00');return `2029년 5월 ${d.getDate()}일 ${['일','월','화','수','목','금','토'][d.getDay()]}요일`;}
+function kktDateLabel(iso){const date=/^2029-05-(2[2-9]|3[01])$/.test(iso||'')?iso:'2029-05-31';const d=new Date(date+'T12:00:00');return `2029년 5월 ${d.getDate()}일 ${['일','월','화','수','목','금','토'][d.getDay()]}요일`;}
 const people=['SHINYU','DOHOON','YOUNGJAE','HANJIN','JIHOON','KYUNGMIN'];const wposts=[['SHINYU','오늘도 고마워요 42 💙'],['DOHOON','오늘 연습도 끝! 다들 수고했어 😎'],['YOUNGJAE','좋은 노래 추천해 주세요 🎵'],['HANJIN','오늘 하늘 너무 예쁘다 ☁️'],['JIHOON','오늘도 파이팅!! 🫶'],['KYUNGMIN','42 뭐해요? ㅎㅎ 💛']];
 const apps=[['Instagram','◎','iglogo'],['WVS','w','wvslogo'],['KKT','●','kktlogo'],['X','𝕏','xlogo'],['사진','✿','photoslogo'],['시계','clock','clocklogo'],['메모','▤','noteslogo'],['메시지','●','messageslogo'],['전화','☎','phonelogo'],['Safari','◉','safari'],['설정','⚙','settings']];
 
