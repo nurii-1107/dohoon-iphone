@@ -631,31 +631,43 @@ function icon(a){let c=art[a[0]]||a[1];return `<button class="appbutton" onclick
 // iPhone-like interactive app dismissal: follow finger, then shrink into home.
 (function installAppHomeGesture(){
  const phone=document.getElementById('phone'), screenEl=document.getElementById('screen');
- let origin=null, ghost=null, isAnimating=false;
+ let origin=null, ghost=null, isAnimating=false, previousApp=null, previousScroll=0;
  function clearGhost(){if(ghost){ghost.remove();ghost=null}phone.classList.remove('swiping-home')}
  function makeGhost(){
    if(ghost)return;
+   previousApp=app;
+   previousScroll=screenEl.scrollTop;
    ghost=document.createElement('div');ghost.className='ios-exit-card';
    const contents=screenEl.cloneNode(true);contents.removeAttribute('id');
    contents.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
-   contents.classList.add('ios-exit-content');
-   ghost.appendChild(contents);phone.appendChild(ghost);
+   contents.classList.add('ios-exit-content');contents.scrollTop=previousScroll;
+   ghost.appendChild(contents);
+   // Put the actual home screen UNDER the moving app immediately.
+   app='home';render();
+   phone.appendChild(ghost);
  }
  function move(dy){if(!ghost)return;const h=phone.getBoundingClientRect().height;
    const progress=Math.min(.75,Math.max(0,dy/h));
    ghost.style.transition='none';ghost.style.transform=`translate3d(0,${-Math.max(0,dy)*.64}px,0) scale(${1-progress*.34})`;
    ghost.style.borderRadius=`${progress*34}px`;
  }
- function finish(success,dy){
-   if(!ghost){if(success)home();return}
+ function finish(success){
+   if(!ghost)return;
    isAnimating=true;
    ghost.style.transition='transform 440ms cubic-bezier(.22,1,.36,1), opacity 370ms ease, border-radius 440ms ease';
    if(success){
-     home();
      ghost.style.transform=`translate3d(0,${-phone.clientHeight*.30}px,0) scale(.16)`;
      ghost.style.borderRadius='40px';ghost.style.opacity='0';
-   }else{ghost.style.transform='translate3d(0,0,0) scale(1)';ghost.style.borderRadius='0px'}
-   setTimeout(()=>{clearGhost();isAnimating=false},success?470:460);
+     setTimeout(()=>{clearGhost();previousApp=null;isAnimating=false},470);
+   }else{
+     ghost.style.transform='translate3d(0,0,0) scale(1)';ghost.style.borderRadius='0px';
+     setTimeout(()=>{
+       const restore=previousApp;
+       clearGhost();
+       if(restore){app=restore;render();screenEl.scrollTop=previousScroll}
+       previousApp=null;isAnimating=false;
+     },460);
+   }
  }
  phone.addEventListener('pointerdown',e=>{
    if(isAnimating||app==='lock'||app==='passcode'||app==='home'){origin=null;return}
@@ -671,10 +683,10 @@ function icon(a){let c=art[a[0]]||a[1];return `<button class="appbutton" onclick
  phone.addEventListener('pointerup',e=>{
    if(!origin||origin.id!==e.pointerId)return;
    const dy=origin.y-e.clientY,dx=Math.abs(origin.x-e.clientX),dt=performance.now()-origin.t;
-   const success=dy>45&&dy>dx*.8 || dy>24&&dt<230&&dy>dx;
-   origin=null;finish(success,dy);
+   const success=(dy>45&&dy>dx*.8)||(dy>24&&dt<230&&dy>dx);
+   origin=null;finish(success);
  },{passive:true});
- phone.addEventListener('pointercancel',()=>{origin=null;finish(false,0)});
+ phone.addEventListener('pointercancel',()=>{origin=null;finish(false)});
 })();
 // Gesture-driven lock screen -> passcode transition.
 let lockGesture=null, lockAnimating=false;
