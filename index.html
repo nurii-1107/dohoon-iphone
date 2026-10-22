@@ -550,6 +550,18 @@ body{position:fixed!important;inset:0!important;width:100%!important;height:100%
 .ios-exit-content{width:100%;height:100%;overflow:hidden;pointer-events:none}
 .ios-exit-content *{pointer-events:none!important}
 @media(prefers-reduced-motion:reduce){.ios-exit-card{transition-duration:.12s!important}}
+</style><style id="lock-swipe-transition-v2">
+#lockview{will-change:transform,opacity;touch-action:none;overscroll-behavior:contain}
+.lock.passcode{transition:transform .38s cubic-bezier(.22,1,.36,1),opacity .38s ease;will-change:transform,opacity}
+.lock.passcode.passcode-arriving{transform:translate3d(0,65px,0);opacity:.2}
+</style><style id="ios-call-controls-refinement">
+#birthday-call .birthday-call-grid{gap:23px 10px;padding-bottom:38px}
+#birthday-call .birthday-call-grid .call-circle{width:min(20vw,82px);height:min(20vw,82px);border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 2px #ffffff16}
+#birthday-call .birthday-call-grid .call-circle svg{width:35px;height:35px;display:block;color:white}
+#birthday-call .birthday-call-grid .birthday-hangup .call-circle{background:#dc2920;border-color:#ec4b42}
+#birthday-call .birthday-call-grid button.selected .call-circle{background:rgba(255,255,255,.42)}
+#birthday-call .birthday-call-grid button small{font-size:13px;color:#fff}
+#birthday-call .birthday-call-top{padding-top:96px}
 </style></head><body><main class="phone wall" id="phone"><div class="status"><span id="statusTime">9:41</span><div class="island"></div><div class="status-indicators" aria-label="가상 셀룰러 네트워크、Wi-Fi 및 배터리"><span id="statusAirplane" style="display:none;font-size:15px">✈</span><svg id="statusCell" width="19" height="15" viewBox="0 0 19 15" aria-label="셀룰러"><rect x="0" y="10" width="3" height="5" rx=".6"/><rect x="5" y="7" width="3" height="8" rx=".6"/><rect x="10" y="4" width="3" height="11" rx=".6"/><rect x="15" y="1" width="3" height="14" rx=".6"/></svg><svg id="statusWifi" width="19" height="15" viewBox="0 0 19 15" fill="none" aria-label="Wi-Fi"><path d="M1.3 5.3Q9.5-1 17.7 5.3M4.5 8.8Q9.5 4.8 14.5 8.8M8 12Q9.5 10.8 11 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9.5" cy="13.5" r="1.2" fill="currentColor"/></svg><div class="status-battery" id="statusBattery" aria-label="배터리 시뮬레이션"><div class="status-battery-fill" id="statusBatteryFill"></div><span id="statusBatteryText" class="status-battery-text"></span></div></div></div><div class="screen" id="screen"></div><button type="button" class="gesture" id="homeGesture" aria-label="탭하여 홈 화면으로" onclick="if(app==='lock'){unlockToPasscode()}else if(app!=='passcode'){home()}"></button><div id="notice"></div></main><script>
 /* Reset only this simulator's saved data on every page load or refresh. */
 try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&(k.startsWith('shinyu_')||k==='wvsSoloPhotos'))localStorage.removeItem(k)}}catch(e){}
@@ -654,15 +666,51 @@ function icon(a){let c=art[a[0]]||a[1];return `<button class="appbutton" onclick
  },{passive:true});
  phone.addEventListener('pointercancel',()=>{origin=null;finish(false,0)});
 })();
-function unlockToPasscode(){if(app!=='lock')return;app='passcode';pin='';pinError='';render()}
-function setupSwipe(){
- const el=$('#lockview');if(!el)return;
- el.addEventListener('pointerdown',e=>{swipeStart={y:e.clientY,x:e.clientX};});
- el.addEventListener('pointerup',e=>{if(!swipeStart)return;let dy=swipeStart.y-e.clientY,dx=Math.abs(swipeStart.x-e.clientX);swipeStart=null;if(dy>30&&dy>dx*.6){unlockToPasscode()}});
- el.addEventListener('pointercancel',()=>swipeStart=null);
- el.addEventListener('wheel',e=>{if(e.deltaY>20){unlockToPasscode()}},{passive:true});
+// Gesture-driven lock screen -> passcode transition.
+let lockGesture=null, lockAnimating=false;
+function unlockToPasscode(){
+ if(app!=='lock'||lockAnimating)return;
+ const el=document.getElementById('lockview');
+ if(!el){app='passcode';pin='';pinError='';render();return}
+ lockAnimating=true;
+ el.style.transition='transform .34s cubic-bezier(.22,1,.36,1),opacity .34s ease';
+ el.style.transform='translate3d(0,-105%,0)';el.style.opacity='0';
+ // Bring the keypad up behind the departing lock screen, rather than swapping instantly.
+ setTimeout(()=>{app='passcode';pin='';pinError='';render();lockAnimating=false;
+   const keypad=document.querySelector('.lock.passcode');
+   if(keypad){keypad.classList.add('passcode-arriving');requestAnimationFrame(()=>requestAnimationFrame(()=>keypad.classList.remove('passcode-arriving')))}
+ },310);
 }
-function renderPasscode(){const digits=['1','2','3','4','5','6','7','8','9','','0','⌫'];screen(`<div class="lock passcode"><div class="pass-title">암호 입력</div><div class="pin-dots">${[0,1,2,3,4,5].map(i=>`<i class="${i<pin.length?'filled':''}"></i>`).join('')}</div><div style="height:20px;font-size:13px">${pinError||'입력하세요 4 자리 숫자 암호'}</div><div class="pin-grid">${digits.map((d,i)=>d?`<button onclick="pinPress('${d}')"><span>${d}</span><small>${['','ABC','DEF','GHI','JKL','MNO','PQRS','TUV','WXYZ','','',''][i]||''}</small></button>`:'<span></span>').join('')}</div><div class="pin-actions"><button onclick="app='lock';pin='';pinError='';render()">취소</button><button onclick="pinPress('⌫')">삭제</button></div></div>`)}
+function setupSwipe(){
+ const el=document.getElementById('lockview');if(!el)return;
+ el.style.touchAction='none';
+ el.addEventListener('pointerdown',e=>{
+   if(lockAnimating||e.target.closest('.lockquick'))return;
+   lockGesture={id:e.pointerId,x:e.clientX,y:e.clientY,lastY:e.clientY,start:performance.now(),dragged:false};
+   el.style.transition='none';
+   try{el.setPointerCapture(e.pointerId)}catch(_){}
+ });
+ el.addEventListener('pointermove',e=>{
+   const g=lockGesture;if(!g||e.pointerId!==g.id||lockAnimating)return;
+   const dy=e.clientY-g.y,dx=e.clientX-g.x;
+   if(Math.abs(dy)>5)g.dragged=true;
+   if(Math.abs(dx)>Math.abs(dy)*1.4)return;
+   const upward=Math.max(0,-dy);
+   el.style.transform=`translate3d(0,${-Math.min(upward,el.clientHeight*.8)}px,0)`;
+   el.style.opacity=String(Math.max(.25,1-upward/(el.clientHeight*.9)));
+   g.lastY=e.clientY;
+ });
+ el.addEventListener('pointerup',e=>{
+   const g=lockGesture;if(!g||e.pointerId!==g.id)return;lockGesture=null;
+   const dy=g.y-e.clientY,dx=Math.abs(g.x-e.clientX),elapsed=performance.now()-g.start;
+   if(dy>65&&dy>dx*.65 || dy>25&&elapsed<230&&dy>dx){unlockToPasscode();return}
+   el.style.transition='transform .32s cubic-bezier(.22,1,.36,1),opacity .32s ease';
+   el.style.transform='translate3d(0,0,0)';el.style.opacity='1';
+ });
+ el.addEventListener('pointercancel',()=>{lockGesture=null;el.style.transition='transform .3s ease,opacity .3s ease';el.style.transform='';el.style.opacity='1'});
+ el.addEventListener('wheel',e=>{if(e.deltaY>20)unlockToPasscode()},{passive:true});
+}
+function renderPasscode(){const digits=['1','2','3','4','5','6','7','8','9','','0','⌫'];screen(`<div class="lock passcode"><div class="pass-title">암호 입력</div><div class="pin-dots">${[0,1,2,3].map(i=>`<i class="${i<pin.length?'filled':''}"></i>`).join('')}</div><div style="height:20px;font-size:13px">${pinError||'입력하세요 4 자리 숫자 암호'}</div><div class="pin-grid">${digits.map((d,i)=>d?`<button onclick="pinPress('${d}')"><span>${d}</span><small>${['','ABC','DEF','GHI','JKL','MNO','PQRS','TUV','WXYZ','','',''][i]||''}</small></button>`:'<span></span>').join('')}</div><div class="pin-actions"><button onclick="app='lock';pin='';pinError='';render()">취소</button><button onclick="pinPress('⌫')">삭제</button></div></div>`)}
 function pinPress(d){if(d==='⌫'){pin=pin.slice(0,-1);pinError='';render();return}if(!/^\d$/.test(d)||pin.length>=4)return;pin+=d;if(pin.length===4){if(pin==='0531'){pin='';pinError='';home();return}pin='';pinError='암호가 틀렸습니다，다시 시도하세요';}render()}
 document.addEventListener('keydown',e=>{if(app==='passcode'){if(/^\d$/.test(e.key))pinPress(e.key);else if(e.key==='Backspace')pinPress('⌫');else if(e.key==='Escape'){app='lock';render()}}else if(app==='lock'&&e.key==='ArrowUp'){app='passcode';render()}});
 
@@ -1177,12 +1225,12 @@ function birthdayDrawCall(answered){
  const el=document.getElementById('birthday-call');if(!el)return;
  el.innerHTML=`<div class="birthday-call-top"><span id="birthday-call-status">${answered?'00:00':'전화 수신 중…'}</span><strong>최영재♡</strong></div>
  <div class="birthday-call-grid">
- <button onclick="birthdaySpeaker=!birthdaySpeaker;this.classList.toggle('selected',birthdaySpeaker)"><span class="call-circle">◉</span><small>오디오</small></button>
- <button onclick="this.classList.toggle('selected')"><span class="call-circle">▣</span><small>FaceTime</small></button>
- <button onclick="birthdayMuted=!birthdayMuted;this.classList.toggle('selected',birthdayMuted)"><span class="call-circle">♩̸</span><small>음소거</small></button>
- <button onclick="this.classList.toggle('selected')"><span class="call-circle">•••</span><small>더 보기</small></button>
- <button onclick="birthdayEndCall(false)" class="birthday-hangup"><span class="call-circle">☎</span><small>${answered?'종료':'거절'}</small></button>
- <button onclick="this.classList.toggle('selected')"><span class="call-circle">⠿</span><small>키패드</small></button>
+ <button onclick="birthdaySpeaker=!birthdaySpeaker;this.classList.toggle('selected',birthdaySpeaker)"><span class="call-circle"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></svg></span><small>오디오</small></button>
+ <button onclick="this.classList.toggle('selected')"><span class="call-circle"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="12" rx="3"/><path d="m15 10 6-4v12l-6-4"/></svg></span><small>FaceTime</small></button>
+ <button onclick="birthdayMuted=!birthdayMuted;this.classList.toggle('selected',birthdayMuted)"><span class="call-circle"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 12 5M12 17v4m-4 0h8M3 3l18 18"/></svg></span><small>음소거</small></button>
+ <button onclick="this.classList.toggle('selected')"><span class="call-circle"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg></span><small>더 보기</small></button>
+ <button onclick="birthdayEndCall(false)" class="birthday-hangup"><span class="call-circle"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 14.8c4.9-4.2 12.1-4.2 17 0"/><path d="M5.8 13.1 4.2 17c-.3.8.1 1.6.9 1.9l2.6.8c.8.2 1.5-.2 1.8-.9l1.1-2.6m7.6-3.1 1.6 3.9c.3.8-.1 1.6-.9 1.9l-2.6.8c-.8.2-1.5-.2-1.8-.9l-1.1-2.6"/></svg></span><small>${answered?'종료':'거절'}</small></button>
+ <button onclick="this.classList.toggle('selected')"><span class="call-circle"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="19" cy="5" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="19" r="1.5"/><circle cx="12" cy="19" r="1.5"/><circle cx="19" cy="19" r="1.5"/></svg></span><small>키패드</small></button>
  </div>
  ${answered?'':`<button class="birthday-answer-floating" onclick="birthdayAnswerCall()">☎ <span>받기</span></button>`}`;
  if(answered){birthdayCallStarted=Date.now();clearInterval(birthdayCallClock);birthdayCallClock=setInterval(()=>{const status=document.getElementById('birthday-call-status');if(status){const sec=Math.floor((Date.now()-birthdayCallStarted)/1000);status.textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}},1000)}
