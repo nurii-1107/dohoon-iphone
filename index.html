@@ -656,7 +656,50 @@ body{position:fixed!important;inset:0!important;width:100%!important;height:100%
 }
 .lock.passcode > *{position:relative;z-index:1}
 </style>
-</head><body><main class="phone wall" id="phone"><div class="status"><span id="statusTime">9:41</span><div class="island"></div><div class="status-indicators" aria-label="가상 셀룰러 네트워크、Wi-Fi 및 배터리"><span id="statusAirplane" style="display:none;font-size:15px">✈</span><svg id="statusCell" width="19" height="15" viewBox="0 0 19 15" aria-label="셀룰러"><rect x="0" y="10" width="3" height="5" rx=".6"/><rect x="5" y="7" width="3" height="8" rx=".6"/><rect x="10" y="4" width="3" height="11" rx=".6"/><rect x="15" y="1" width="3" height="14" rx=".6"/></svg><svg id="statusWifi" width="19" height="15" viewBox="0 0 19 15" fill="none" aria-label="Wi-Fi"><path d="M1.3 5.3Q9.5-1 17.7 5.3M4.5 8.8Q9.5 4.8 14.5 8.8M8 12Q9.5 10.8 11 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9.5" cy="13.5" r="1.2" fill="currentColor"/></svg><div class="status-battery" id="statusBattery" aria-label="배터리 시뮬레이션"><div class="status-battery-fill" id="statusBatteryFill"></div><span id="statusBatteryText" class="status-battery-text"></span></div></div></div><div class="screen" id="screen"></div><button type="button" class="gesture" id="homeGesture" aria-label="탭하여 홈 화면으로" onclick="if(app==='lock'){unlockToPasscode()}else if(app!=='passcode'){home()}"></button><div id="notice"></div><div id="simBrightnessShade" aria-hidden="true"></div></main><script>
+<style id="ig-real-light-2029">
+.ig-page{background:#fff!important;color:#101114!important;padding-bottom:70px!important}
+.ig-top{background:#fff!important;color:#111!important;border-bottom:0!important;padding:13px 16px 12px!important;align-items:center!important}
+.ig-top>b{font-family:Georgia,'Times New Roman',serif!important;font-style:normal!important;font-size:29px!important;font-weight:700!important;letter-spacing:-1.9px!important}
+.ig-top button,.ig-bottom button{color:#111!important;border:0;background:transparent}
+.ig-top button{display:grid;place-items:center;font-size:32px!important;padding:0;min-width:32px}
+.ig-stories{background:#fff!important;display:flex!important;gap:13px!important;padding:10px 13px 14px!important;overflow-x:auto!important;border-bottom:0!important;scrollbar-width:none}
+.ig-stories button{flex:0 0 75px!important;min-width:75px!important;color:#171717!important;gap:8px!important;font-size:11px!important}
+.ig-stories small{font-size:11px!important;white-space:nowrap;max-width:77px;overflow:hidden;text-overflow:ellipsis}
+.ig-story-ring{width:70px;height:70px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:linear-gradient(30deg,#ffd12c 8%,#fa6524 34%,#ed1791 65%,#8c39e3 94%);position:relative;padding:3px}
+.ig-story-ring.ig-mine{background:#f1f1f1}
+.ig-story-inner{background:#e7e9ed;border:3px solid white;border-radius:50%;height:100%;width:100%;overflow:hidden;display:grid;place-items:center;color:#647181;font-weight:800;font-size:14px}
+.ig-story-inner img{width:100%;height:100%;object-fit:cover}
+.ig-add-story{position:absolute;right:0;bottom:0;background:#202329;color:white;border:2px solid white;border-radius:50%;font-style:normal;font-size:20px;line-height:21px;width:25px;height:25px}
+.ig-post{border-bottom:1px solid #f1f1f1!important;padding-bottom:12px!important}
+.ig-post-head{padding:9px 12px!important;color:#111!important}
+.ig-post-head .ig-avatar{height:37px;width:37px;background:#5594d4!important;border:0!important;color:#fff!important;font-size:10px!important}
+.ig-user span{color:#353535!important;font-size:11px!important}
+.ig-media-real{aspect-ratio:1/1.05!important;background:#f2f3f5!important}
+.ig-actions{color:#111!important;padding:9px 12px 4px!important;gap:15px!important}
+.ig-actions button{color:#111!important}.ig-actions button.liked{color:#ee3458!important}
+.ig-post-likes{font-size:13px;font-weight:600;margin-left:-7px}
+.ig-copy{color:#161616!important;padding:3px 12px!important;font-size:12px!important}
+.ig-date{color:#8e8e8e!important;margin:5px 12px!important;font-size:10px!important}
+.ig-bottom{position:sticky!important;bottom:5px!important;background:#ffffffed!important;color:#111!important;border:1px solid #e9e9e9!important;border-radius:27px!important;box-shadow:0 3px 16px #0002!important;backdrop-filter:blur(14px);margin:0 9px!important;padding:11px 4px!important}
+.ig-bottom button{color:#111!important;display:grid;place-items:center}
+.ig-nav-profile{display:grid;place-items:center;background:#e9eff3;border-radius:50%;height:25px;width:25px;font-size:15px}
+.ig-profile{color:#151515!important;background:#fff!important}
+.ig-profile-header p,.ig-profile>p,.ig-profile-hint{color:#747474!important}
+.ig-private-empty{border-color:#eee!important;color:#111!important}
+.ig-private-empty small{color:#888!important}
+.ig-private-title{color:#111!important}
+.ig-known-story{position:absolute;inset:0;z-index:90;background:#16181d;color:white;display:flex;flex-direction:column;overflow:hidden}
+.ig-known-progress{height:3px;background:#ffffff66;margin:13px 12px 8px;border-radius:5px;overflow:hidden}
+.ig-known-progress i{display:block;width:100%;height:100%;background:white}
+.ig-known-header{display:flex;align-items:center;gap:9px;padding:4px 13px;z-index:2}
+.ig-known-header .ig-story-ring{width:35px;height:35px;padding:2px}
+.ig-known-header .ig-story-inner{border-width:1px;font-size:8px}
+.ig-known-header b{font-size:13px}.ig-known-header small{font-size:11px;opacity:.7}
+.ig-known-header button{margin-left:auto;border:0;background:none;color:white;font-size:31px}
+.ig-known-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
+.ig-known-caption{position:relative;margin:auto 20px 75px;text-align:center;font-size:18px;font-weight:700;text-shadow:0 2px 8px #000}
+.ig-known-reply{position:absolute;bottom:17px;left:15px;right:15px;border:1px solid #fff9;border-radius:30px;padding:12px 15px;font-size:12px;display:flex;justify-content:space-between;background:#0002}
+</style></head><body><main class="phone wall" id="phone"><div class="status"><span id="statusTime">9:41</span><div class="island"></div><div class="status-indicators" aria-label="가상 셀룰러 네트워크、Wi-Fi 및 배터리"><span id="statusAirplane" style="display:none;font-size:15px">✈</span><svg id="statusCell" width="19" height="15" viewBox="0 0 19 15" aria-label="셀룰러"><rect x="0" y="10" width="3" height="5" rx=".6"/><rect x="5" y="7" width="3" height="8" rx=".6"/><rect x="10" y="4" width="3" height="11" rx=".6"/><rect x="15" y="1" width="3" height="14" rx=".6"/></svg><svg id="statusWifi" width="19" height="15" viewBox="0 0 19 15" fill="none" aria-label="Wi-Fi"><path d="M1.3 5.3Q9.5-1 17.7 5.3M4.5 8.8Q9.5 4.8 14.5 8.8M8 12Q9.5 10.8 11 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9.5" cy="13.5" r="1.2" fill="currentColor"/></svg><div class="status-battery" id="statusBattery" aria-label="배터리 시뮬레이션"><div class="status-battery-fill" id="statusBatteryFill"></div><span id="statusBatteryText" class="status-battery-text"></span></div></div></div><div class="screen" id="screen"></div><button type="button" class="gesture" id="homeGesture" aria-label="탭하여 홈 화면으로" onclick="if(app==='lock'){unlockToPasscode()}else if(app!=='passcode'){home()}"></button><div id="notice"></div><div id="simBrightnessShade" aria-hidden="true"></div></main><script>
 /* Reset only this simulator's saved data on every page load or refresh. */
 try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&(k.startsWith('shinyu_')||k==='wvsSoloPhotos'))localStorage.removeItem(k)}}catch(e){}
 </script><script>
@@ -1034,7 +1077,24 @@ function igToggleLike(id,button){likes[id]=!likes[id];save('likes',likes);button
 function igPost(p){return `<article class="ig-post" id="${p.id}"><div class="ig-post-head"><div class="ig-avatar">TWS</div><div class="ig-user"><b>tws_pledis</b><span>TWS</span></div><span class="ig-more">⋯</span></div>${igPhoto(p)}<div class="ig-actions ig-real-actions"><button title="좋아요" aria-pressed="${!!likes[p.id]}" class="${likes[p.id]?'liked':''}" onclick="igToggleLike('${p.id}',this)">${igIcon('heart',!!likes[p.id])}</button><button title="댓글">${igIcon('comment')}</button><button title="리포스트">${igIcon('repost')}</button><button title="공유">${igIcon('share')}</button><button class="ig-save" title="저장">${igIcon('bookmark')}</button></div><div class="ig-copy"><b>tws_pledis</b> TWS 💙</div></article>`}
 function renderPrivateIG(){return `<div class="ig-profile private-profile"><div class="ig-private-title"><b>may31.archive</b><span>☰</span></div><div class="ig-profile-header"><div class="ig-avatar large private-avatar">☁️</div><div class="private-stats"><div><b>0</b><small>게시물</small></div><div><b>12</b><small>팬</small></div><div><b>1</b><small>팔로우</small></div></div></div><b>dohoon · daily archive</b><p>조용히 남기는 하루 ☁️<br>기록용 ☁️</p><div class="private-controls"><button>프로필 편집</button><button>팔로잉 보기</button></div><div class="ig-private-empty"><div style="border:2px solid currentColor;border-radius:50%;width:68px;height:68px;display:grid;place-items:center;margin:0 auto 13px;font-size:28px">▦</div><b>아직 게시물이 없습니다</b></div></div>`}
 function renderFollowingIG(){return `<div class="ig-profile"><div class="ig-private-title"><button onclick="igTab='profile';render()">‹</button><b>팔로잉</b></div><div class="ig-private-note">팔로잉</div><button class="ig-follow-row" onclick="igTab='official';render()"><span class="ig-avatar">TWS</span><span><b>tws_pledis</b><small>TWS 공식 계정</small></span><span>팔로잉</span></button></div>`}
-function renderIG(){screen(`<div class="page ig-page"><div class="ig-top"><button style="font-size:29px">＋</button><b>Instagram</b><button style="font-size:28px">♡</button></div>${igTab==='profile'?renderPrivateIG():`<div class="ig-stories"><button><span class="ig-story-avatar mine">＋</span><small>내 스토리</small></button><button><span class="ig-story-avatar">TWS:</span><small>tws_pledis</small></button><button><span class="ig-story-avatar alt">42</span><small>tws_fan</small></button><button><span class="ig-story-avatar pink">M</span><small>mnet_official</small></button></div>${igFeed.map(igPost).join('')}`}<div class="ig-bottom"><button onclick="igTab='feed';render()" class="${igTab!=='profile'?'selected':''}" title="홈">⌂</button><button title="Reels">▣</button><button title="DM">➤</button><button title="검색">⌕</button><button onclick="igTab='profile';render()" class="${igTab==='profile'?'selected':''}" title="프로필">◉</button></div></div>`)}
+function igStoryAvatar(label,image,mine=false){return `<span class="ig-story-ring ${mine?'ig-mine':''}"><span class="ig-story-inner">${image?`<img src="${image}" alt="" onerror="this.style.display='none'">`:`<span>${label}</span>`}</span>${mine?'<i class="ig-add-story">+</i>':''}</span>`}
+const igKnownStories=[
+ {name:'내 스토리',label:'☁️',mine:true,image:''},
+ {name:'_choiyoungjae',label:'영재',image:igPublicPhotos[1]},
+ {name:'shinyu',label:'신유',image:igPublicPhotos[2]},
+ {name:'hanjin',label:'한진',image:igPublicPhotos[3]},
+ {name:'jihoon',label:'지훈',image:igPublicPhotos[4]},
+ {name:'kyungmin',label:'경민',image:igPublicPhotos[5]},
+ {name:'tws_pledis',label:'TWS:',image:igPublicPhotos[0]}
+];
+function igOpenKnownStory(index){
+ if(index===0){notify('아직 올린 스토리가 없습니다');return}
+ const item=igKnownStories[index];const host=document.querySelector('.ig-page');if(!host)return;
+ const old=document.getElementById('ig-known-story');if(old)old.remove();
+ host.insertAdjacentHTML('beforeend',`<div class="ig-known-story" id="ig-known-story"><div class="ig-known-progress"><i></i></div><div class="ig-known-header">${igStoryAvatar(item.label,item.image)}<b>${item.name}</b><small>5시간</small><button onclick="document.getElementById('ig-known-story').remove()" aria-label="닫기">×</button></div><img class="ig-known-image" src="${item.image}" alt="${item.name} 스토리"><div class="ig-known-caption">오늘도 좋은 하루 💙</div><div class="ig-known-reply">메시지 보내기 <span>♡　➤</span></div></div>`);
+}
+function igProfileIcon(){return `<span class="ig-nav-profile">☁️</span>`}
+function renderIG(){screen(`<div class="page ig-page"><div class="ig-top"><button aria-label="추가">＋</button><b>Instagram</b><button aria-label="알림">${igIcon('heart')}</button></div>${igTab==='profile'?renderPrivateIG():`<div class="ig-stories">${igKnownStories.map((p,i)=>`<button onclick="igOpenKnownStory(${i})">${igStoryAvatar(p.label,p.image,p.mine)}<small>${p.name}</small></button>`).join('')}</div>${igFeed.map((p,i)=>`<article class="ig-post"><div class="ig-post-head"><span class="ig-avatar">TWS:</span><div class="ig-user"><b>tws_pledis</b><span>♬ TWS · original audio</span></div><span class="ig-more">⋯</span></div>${igPhoto(p)}<div class="ig-actions ig-real-actions"><button onclick="igToggleLike('${p.id}',this)" class="${likes[p.id]?'liked':''}">${igIcon('heart',!!likes[p.id])}</button><button>${igIcon('repost')}</button><button>${igIcon('share')}</button><span class="ig-post-likes">${385+i*37}</span><button class="ig-save">${igIcon('bookmark')}</button></div><div class="ig-copy"><b>tws_pledis</b> ${p.caption}</div><div class="ig-date">5월 ${31-Math.min(i,8)}일 · 번역 보기</div></article>`).join('')}`}<div class="ig-bottom"><button onclick="igTab='feed';render()" class="${igTab!=='profile'?'selected':''}" title="홈"><svg viewBox='0 0 24 24' width='26' height='26' fill='currentColor'><path d='M3 10.4 12 3l9 7.4V21h-6.5v-7h-5v7H3z'/></svg></button><button title="Reels">▣</button><button title="DM">➤</button><button title="검색">⌕</button><button onclick="igTab='profile';render()" class="${igTab==='profile'?'selected':''}" title="프로필">${igProfileIcon()}</button></div></div>`)}
 let igStoryIndex=0,igStoryStarted=0,igStoryTimer=null,igStoryPaused=false;
 function closeIGStory(){if(igStoryTimer){clearInterval(igStoryTimer);igStoryTimer=null}igStoryPaused=false;render()}
 function openIGStory(i=0){
